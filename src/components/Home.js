@@ -132,7 +132,7 @@ export default function Home() {
                     {isLoading ?
                         <Loading className="loader" type="spin"></Loading>
                         :
-                        <iframe srcDoc={htmlCode + cssCode + jsCode} title="Result"></iframe>
+                        <iframe srcDoc={isErrorMsg ? isErrorMsg : (htmlCode + cssCode + jsCode)} title="Result"></iframe>
                     }
                 </div>
 
