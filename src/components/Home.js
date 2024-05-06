@@ -1,7 +1,10 @@
 import { GenerativeModel } from "@google/generative-ai"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import './styles.css' // Import CSS file
 import Loading from "react-loading"
+import { Bounce, ToastContainer, toast } from "react-toastify"
+import 'react-toastify/dist/ReactToastify.css';
+import TextAreaEditor from "./TextAreaEditor"
 
 export default function Home() {
     // Google Generative AI API Key
@@ -9,7 +12,7 @@ export default function Home() {
     // show error reason if AI prompt failed
     const onErrorShowReason = true
     // Default prompt - don't change
-    const prompt = "generate web page code, if not possible as response return " + (onErrorShowReason ? "'null:<reason>'" : "'null'") + ", the following prompt is : "
+    const prompt = "Rule: Generate web page code using Html + Css (required) + JavaScript, if not possible as response return " + (onErrorShowReason ? "'null:<reason>'" : "'null'") + ". User prompt: "
 
 
     const [input, setInput] = useState("")
@@ -21,6 +24,13 @@ export default function Home() {
     const [htmlCode, sethtmlCode] = useState("")
     const [cssCode, setcssCode] = useState("")
     const [jsCode, setjsCode] = useState("")
+
+
+    useEffect(() => {
+        if (isErrorMsg) {
+            toast.error(isErrorMsg)
+        }
+    }, [isErrorMsg])
 
 
     const getGPT = () => {
@@ -100,63 +110,74 @@ export default function Home() {
 
         const result = await getGPTResult()
 
+        // AI RESULT
         if (result.indexOf("null") === 0) {
+            // error
             setisErrorMsg(onErrorShowReason ? result.slice(5) : true)
+        } else {
+            // success
+            setGptResult(result)
+            const extractedCode = extractWebCodes(result)
+            sethtmlCode(extractedCode.html)
+            setcssCode(extractedCode.css)
+            setjsCode(extractedCode.js)
         }
 
-
-        // AI RESULT
-        setGptResult(result)
-        const extractedCode = extractWebCodes(result)
-        sethtmlCode(extractedCode.html)
-        setcssCode(extractedCode.css)
-        setjsCode(extractedCode.js)
 
         setIsLoading(false)
     }
 
-    const copyTextToClipboard = async (text = "") => {
-        try {
-            await navigator.clipboard.writeText(text)
-        } catch (error) {
-            alert("Sorry can't copy the provided Code !!")
-        }
-    }
 
 
 
     return (
         <div className="container">
+            <ToastContainer
+                position="bottom-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover={true}
+                theme="colored"
+                style={{ width: "50%" }}
+                toastStyle={{ fontWeight: "bold" }}
+                transition={Bounce}
+            />
+
             <div className="editor-container">
                 <div className="left-container">
                     {isLoading ?
                         <Loading className="loader" type="spin"></Loading>
                         :
-                        <iframe srcDoc={isErrorMsg ? isErrorMsg : (htmlCode + cssCode + jsCode)} title="Result"></iframe>
+                        <iframe srcDoc={htmlCode + cssCode + jsCode} title="Result"></iframe>
                     }
                 </div>
 
 
 
                 <div className="right-container">
-                    <textarea
+                    <TextAreaEditor
+                        title={"Html Code"}
                         disabled={isLoading}
                         value={htmlCode}
-                        onChange={(e) => sethtmlCode(e.target.value)}
-                        placeholder="<html>&#10;&#0;&#0;Html Code&#10;</html>"
-                    ></textarea>
-                    <textarea
+                        onChange={sethtmlCode}
+                        placeholder="<html>&#10;Html Code&#10;</html>" />
+                    <TextAreaEditor
+                    title={"Css Code"}
                         disabled={isLoading}
                         value={cssCode}
-                        onChange={(e) => setcssCode(e.target.value)}
-                        placeholder="<style>&#10;&#0;&#0;Css Code&#10;</style>"
-                    ></textarea>
-                    <textarea
+                        onChange={setcssCode}
+                        placeholder="<style>&#10;Css Code&#10;</style>" />
+                    <TextAreaEditor
+                    title={"JavaScript Code"}
                         disabled={isLoading}
                         value={jsCode}
-                        onChange={(e) => setjsCode(e.target.value)}
-                        placeholder="<script>&#10;&#0;&#0;Js Code&#10;</script>"
-                    ></textarea>
+                        onChange={setjsCode}
+                        placeholder="<script src='http://example.com/file.js' />&#10;<script>&#10;JavaScript Code&#10;</script>" />
                 </div>
             </div>
 
@@ -169,7 +190,7 @@ export default function Home() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => {
-                        if (e.key == "Enter") {
+                        if (e.key === "Enter") {
                             chat()
                         }
                     }}
