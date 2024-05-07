@@ -1,5 +1,5 @@
 import { GenerativeModel } from "@google/generative-ai"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import './styles.css' // Import CSS file
 import Loading from "react-loading"
 import { Bounce, ToastContainer, toast } from "react-toastify"
@@ -12,25 +12,18 @@ export default function Home() {
     // show error reason if AI prompt failed
     const onErrorShowReason = true
     // Default prompt - don't change
-    const prompt = "Rule: Generate web page code using Html + Css (required) + JavaScript, if not possible as response return " + (onErrorShowReason ? "'null:<reason>'" : "'null'") + ". User prompt: "
+    const prompt = "Generate HTML, CSS, and JavaScript code for a web page, if not possible as response return " + (onErrorShowReason ? "'null:<reason>'" : "'null'") + ". User prompt: "
 
 
-    const [input, setInput] = useState("")
+    const [userPrompt, setUserPrompt] = useState("")
     const [isLoading, setIsLoading] = useState(null)
-    const [isErrorMsg, setisErrorMsg] = useState(false)
     const [gptInstance, setGptInstance] = useState()
-    const [gptResult, setGptResult] = useState("")
 
+    const [gptResult, setGptResult] = useState("")
     const [htmlCode, sethtmlCode] = useState("")
     const [cssCode, setcssCode] = useState("")
     const [jsCode, setjsCode] = useState("")
 
-
-    useEffect(() => {
-        if (isErrorMsg) {
-            toast.error(isErrorMsg)
-        }
-    }, [isErrorMsg])
 
 
     const getGPT = () => {
@@ -54,7 +47,7 @@ export default function Home() {
     const getGPTResult = async () => {
         let response
         try {
-            response = (await getGPT().startChat().sendMessage(prompt + input)).response
+            response = (await getGPT().startChat().sendMessage(prompt + userPrompt)).response
 
             // clean result code
             const result = response.text().replace(/```\w*/g, '')
@@ -106,14 +99,14 @@ export default function Home() {
 
     const chat = async () => {
         setIsLoading(true)
-        setisErrorMsg(false)
 
         const result = await getGPTResult()
 
         // AI RESULT
         if (result.indexOf("null") === 0) {
             // error
-            setisErrorMsg(onErrorShowReason ? result.slice(5) : true)
+            const error = onErrorShowReason ? result.slice(5) : "Something went wrong !!"
+            toast.error(error)
         } else {
             // success
             setGptResult(result)
@@ -161,19 +154,22 @@ export default function Home() {
 
                 <div className="right-container">
                     <TextAreaEditor
+                        id={"html"}
                         title={"Html Code"}
                         disabled={isLoading}
                         value={htmlCode}
                         onChange={sethtmlCode}
                         placeholder="<html>&#10;Html Code&#10;</html>" />
                     <TextAreaEditor
-                    title={"Css Code"}
+                        id={"css"}
+                        title={"Css Code"}
                         disabled={isLoading}
                         value={cssCode}
                         onChange={setcssCode}
                         placeholder="<style>&#10;Css Code&#10;</style>" />
                     <TextAreaEditor
-                    title={"JavaScript Code"}
+                        id={"js"}
+                        title={"JavaScript Code"}
                         disabled={isLoading}
                         value={jsCode}
                         onChange={setjsCode}
@@ -187,13 +183,14 @@ export default function Home() {
                     className="input-field"
                     disabled={isLoading}
                     type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    value={userPrompt}
+                    onChange={(e) => setUserPrompt(e.target.value)}
                     onKeyDown={(e) => {
                         if (e.key === "Enter") {
                             chat()
                         }
                     }}
+                    placeholder="Message WebCraft..."
                 />
                 <button className="generate-button" disabled={isLoading} onClick={chat}>
                     Generate

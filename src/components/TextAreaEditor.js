@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { CiMaximize1, CiMinimize1 } from "react-icons/ci"
+import { getSettings, setSetting } from "./Settings"
 
-export default function TextAreaEditor({ title, value, onChange, disabled, placeholder }) {
+export default function TextAreaEditor({ id, title, value, onChange, disabled, placeholder }) {
     const [isHover, setisHover] = useState(false)
-    const [isMinimized, setisMinimized] = useState(false)
+    const [isMinimized, setisMinimized] = useState(getSettings().isMinimized[id])
 
     const toggleMinimized = () => {
         setisMinimized(!isMinimized)
+        setSetting("isMinimized." + id, !isMinimized)
     }
 
     const copyTextToClipboard = async () => {
@@ -19,11 +21,9 @@ export default function TextAreaEditor({ title, value, onChange, disabled, place
 
 
     return (
-        <div className="editor"
+        <div className={!isMinimized ? "editor" : "editor minimized"}
             onMouseEnter={() => setisHover(true)}
-            onMouseLeave={() => setisHover(false)}
-            style={isMinimized ? {height:"auto"} : {}}
-            >
+            onMouseLeave={() => setisHover(false)}>
 
             <div className="editor-header">
                 <div className="editor-header-title">{title}</div>

@@ -9,7 +9,7 @@
 
 button{
     padding: 5px;
-    font-size: 15px;
+    font-size: 3vh;
     background-color: #007bff;
     color: #fff;
     cursor: pointer;
@@ -85,14 +85,19 @@ button:disabled {
     height: 100%;
     border: 3px solid #ccc;
     background-color: transparent;
+    transition: 0.2s;
+}
+
+.editor.minimized{
+    height: 5vh;
     transition: 0.5s;
 }
 
-
 .editor-button {
     position: absolute;
-    right: 10px;
-    top: 35px;
+    right: 1vh;
+    top: 6vh;
+    font-size: 2.5vh;
 }
 
 
@@ -101,26 +106,26 @@ button:disabled {
     text-align: left;
     display: flex;
     align-items: center;
-    padding: 2px;
     justify-content: space-between;
+    height: 5vh;
 }
 
 
 .editor-header-title {
-    font-size: 15px;
+    font-size: 3vh;
     font-weight: bold;
 }
 
 
 .editor-header-button{
-    padding: 5px 10px;
+    padding: 0.3vh 1vh;
 }
 
 
 textarea {
     height: 100%;
     width: 100%;
-    font-size: 14px;
+    font-size: 2vh;
     border: none;
     background-color: transparent;
     resize: none;
