@@ -1,10 +1,12 @@
 import { GenerativeModel } from "@google/generative-ai"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import './styles.css' // Import CSS file
 import Loading from "react-loading"
 import { Bounce, ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
 import TextAreaEditor from "./TextAreaEditor"
+import { IoIosSend } from "react-icons/io"
+import { MdCancel } from "react-icons/md"
 
 export default function Home() {
     // Google Generative AI API Key
@@ -18,6 +20,7 @@ export default function Home() {
     const [userPrompt, setUserPrompt] = useState("")
     const [isLoading, setIsLoading] = useState(null)
     const [gptInstance, setGptInstance] = useState()
+    const lastRequestIdRef = useRef(0)
 
     const [gptResult, setGptResult] = useState("")
     const [htmlCode, sethtmlCode] = useState("")
@@ -97,10 +100,31 @@ export default function Home() {
     }
 
 
-    const chat = async () => {
+
+
+
+    const newChat = () => {
+        lastRequestIdRef.current++
+
+        if (isLoading) {
+            setIsLoading(false)
+        } else {
+            chat(lastRequestIdRef.current)
+        }
+    }
+
+
+
+
+    const chat = async (request_id) => {
         setIsLoading(true)
 
         const result = await getGPTResult()
+
+        // check last request id is the same, if not means canceled request
+        if(lastRequestIdRef.current!=request_id){
+            return
+        }
 
         // AI RESULT
         if (result.indexOf("null") === 0) {
@@ -179,7 +203,7 @@ export default function Home() {
 
 
             <div className="input-container">
-                <input
+                <textarea
                     className="input-field"
                     disabled={isLoading}
                     type="text"
@@ -192,8 +216,16 @@ export default function Home() {
                     }}
                     placeholder="Message WebCraft..."
                 />
-                <button className="generate-button" disabled={isLoading} onClick={chat}>
-                    Generate
+                <button className={!isLoading ? "prompt-button" : "prompt-button canceled"} onClick={newChat}>
+                    {isLoading ?
+                        <>
+                            Cancel <MdCancel />
+                        </>
+                        :
+                        <>
+                            Generate < IoIosSend />
+                        </>
+                    }
                 </button>
             </div>
         </div >

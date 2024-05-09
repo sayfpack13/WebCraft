@@ -7,7 +7,7 @@
     overflow: hidden;
 }
 
-button{
+button {
     padding: 5px;
     font-size: 3vh;
     background-color: #007bff;
@@ -17,6 +17,7 @@ button{
     border-radius: 5px;
     transition: 0.5s;
 }
+
 button:hover {
     background-color: #0044ff;
     transition: 0.2s;
@@ -39,16 +40,34 @@ button:disabled {
 }
 
 .input-field {
-    width: 300px;
-    padding: 10px;
-    font-size: 16px;
+    width: 50%;
+    max-height: 30vh;
+    height: 6%;
+    min-height: 6vh;
+    margin-right: 10px;
+    font-size: 2.5vh;
+    background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 5px;
-    margin-right: 10px;
+    resize: vertical;
 }
 
-.generate-button {
-    padding: 10px 20px;
+.prompt-button {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.prompt-button.canceled{
+    background-color: #ff2019;
+}
+.prompt-button.canceled:hover{
+    background-color: #ff0900;
+}
+
+.prompt-button svg {
+    font-size: 3.5vh;
+    margin-left: 5px;
 }
 
 
@@ -79,7 +98,6 @@ button:disabled {
 }
 
 .editor {
-    position: relative;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -88,15 +106,26 @@ button:disabled {
     transition: 0.2s;
 }
 
-.editor.minimized{
+
+.editor.minimized {
     height: 5vh;
     transition: 0.5s;
 }
 
-.editor-button {
+.editor-content {
+    position: relative;
+    height: 100%;
+}
+
+.editor-content.minimized {
+    display: none;
+}
+
+
+.editor-copy-button {
     position: absolute;
     right: 1vh;
-    top: 6vh;
+    top: 1vh;
     font-size: 2.5vh;
 }
 
@@ -117,7 +146,7 @@ button:disabled {
 }
 
 
-.editor-header-button{
+.editor-header-button {
     padding: 0.3vh 1vh;
 }
 

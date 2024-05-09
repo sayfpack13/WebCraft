@@ -30,19 +30,16 @@ export default function TextAreaEditor({ id, title, value, onChange, disabled, p
                 <button onClick={toggleMinimized} className="editor-header-button">{isMinimized ? <CiMaximize1 /> : <CiMinimize1 />}</button>
 
             </div>
-            {!isMinimized &&
-                <>
-                    <textarea
-                        disabled={disabled}
-                        value={value}
-                        onChange={(e) => onChange(e.target.value)}
-                        placeholder={placeholder}
-                    />
-                    <button disabled={disabled} className="editor-button" onClick={copyTextToClipboard} style={!isHover ? { display: "none" } : { display: "block" }}>Copy</button>
 
-                </>
-            }
-
+            <div className={!isMinimized ? "editor-content" : "editor-content minimized"}>
+                <textarea
+                    disabled={disabled}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    placeholder={placeholder}
+                />
+                <button disabled={disabled} className="editor-copy-button" onClick={copyTextToClipboard} style={!isHover ? { display: "none" } : { display: "block" }}>Copy</button>
+            </div>
         </div>
     )
 }
