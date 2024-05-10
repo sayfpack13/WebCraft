@@ -230,7 +230,7 @@ export default function Home() {
                     }}
                     placeholder="Message WebCraft..."
                 />
-                <button className={!isLoading ? "prompt-button" : "prompt-button canceled"} onClick={newChat}>
+                <button className={!isLoading ? "prompt-button" : "prompt-button canceled"} onClick={chat}>
                     {isLoading ?
                         <>
                             Cancel <MdCancel />
