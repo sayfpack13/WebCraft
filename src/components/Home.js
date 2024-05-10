@@ -48,7 +48,7 @@ export default function Home() {
             return
         }
 
-        setWebCode(htmlCode  + cssCode + jsCode)
+        setWebCode(htmlCode + cssCode + jsCode)
         setSetting("code.html", htmlCode)
         setSetting("code.css", cssCode)
         setSetting("code.js", jsCode)
@@ -97,39 +97,39 @@ export default function Home() {
 
 
     const extractWebCodes = (code = "") => {
-        const htmlPattern = /(?:<!DOCTYPE html>|<html>)[\s\S]*?<\/html>/i;
-        const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi;
-        const cssPattern = /<style\b[^>]*>[\s\S]*?<\/style>/gi;
-    
-        let htmlCode = "";
-        let cssCode = "";
-        let jsCode = "";
-    
-        const htmlMatch = code.match(htmlPattern);
-        const scriptsMatch = code.match(scriptPattern);
-        const cssMatch = code.match(cssPattern);
-    
-        if (htmlMatch) {
-            htmlCode = htmlMatch[0];
-            htmlCode = htmlCode.replace(scriptPattern, "");
-            htmlCode = htmlCode.replace(cssPattern, "");
+        const htmlPattern = /(?:<!DOCTYPE html>|<html>)[\s\S]*?<\/html>/i
+        const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi
+        const cssPattern = /<style\b[^>]*>[\s\S]*?<\/style>/gi
+
+        let htmlCode = ""
+        let cssCode = ""
+        let jsCode = ""
+
+        const htmlsMatch = code.match(htmlPattern)
+        const scriptsMatch = code.match(scriptPattern)
+        const cssMatch = code.match(cssPattern)
+
+        if (htmlsMatch) {
+            htmlCode = htmlsMatch.join("\n")
+            htmlCode = htmlCode.replace(scriptPattern, "")
+            htmlCode = htmlCode.replace(cssPattern, "")
         }
-    
+
         if (scriptsMatch) {
-            jsCode = scriptsMatch.join("\n");
+            jsCode = scriptsMatch.join("\n")
         }
-    
+
         if (cssMatch) {
-            cssCode = cssMatch.join("\n");
+            cssCode = cssMatch.join("\n")
         }
-    
+
         return {
             html: htmlCode,
             js: jsCode,
             css: cssCode
         };
     };
-    
+
 
 
 
