@@ -23,10 +23,10 @@ export default function Home() {
     const [gptInstance, setGptInstance] = useState()
     const lastRequestIdRef = useRef(0)
 
-    const [gptResult, setGptResult] = useState(getSettings().code.full)
-    const [htmlCode, sethtmlCode] = useState(getSettings().code.html)
-    const [cssCode, setcssCode] = useState(getSettings().code.css)
-    const [jsCode, setjsCode] = useState(getSettings().code.js)
+    const [gptResult, setGptResult] = useState(getSettings().code.full || "")
+    const [htmlCode, sethtmlCode] = useState(getSettings().code.html || "")
+    const [cssCode, setcssCode] = useState(getSettings().code.css || "")
+    const [jsCode, setjsCode] = useState(getSettings().code.js || "")
 
 
     useEffect(() => {

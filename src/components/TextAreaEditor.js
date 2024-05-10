@@ -4,7 +4,7 @@ import { getSettings, setSetting } from "./Settings"
 
 export default function TextAreaEditor({ id, title, value, onChange, disabled, placeholder }) {
     const [isHover, setisHover] = useState(false)
-    const [isMinimized, setisMinimized] = useState(getSettings().isMinimized[id])
+    const [isMinimized, setisMinimized] = useState(getSettings().isMinimized[id] || false)
 
     const toggleMinimized = () => {
         setisMinimized(!isMinimized)
