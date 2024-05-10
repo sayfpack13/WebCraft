@@ -48,7 +48,7 @@ export default function Home() {
             return
         }
 
-        setWebCode(htmlCode + cssCode + jsCode)
+        setWebCode(htmlCode + "\n" + cssCode + "\n" + jsCode)
         setSetting("code.html", htmlCode)
         setSetting("code.css", cssCode)
         setSetting("code.js", jsCode)
@@ -110,17 +110,17 @@ export default function Home() {
         const cssMatch = code.match(cssPattern)
 
         if (htmlsMatch) {
-            htmlCode = htmlsMatch.join("\n")
+            htmlCode = htmlsMatch
             htmlCode = htmlCode.replace(scriptPattern, "")
             htmlCode = htmlCode.replace(cssPattern, "")
         }
 
         if (scriptsMatch) {
-            jsCode = scriptsMatch.join("\n")
+            jsCode = scriptsMatch
         }
 
         if (cssMatch) {
-            cssCode = cssMatch.join("\n")
+            cssCode = cssMatch
         }
 
         return {
@@ -163,7 +163,7 @@ export default function Home() {
         } else {
             // success
             const extractedCode = extractWebCodes(result)
-            setWebCode(extractedCode.html + extractedCode.css + extractedCode.js)
+            setWebCode(extractedCode.html + "\n" + extractedCode.css + "\n" + extractedCode.js)
             sethtmlCode(extractedCode.html)
             setcssCode(extractedCode.css)
             setjsCode(extractedCode.js)
