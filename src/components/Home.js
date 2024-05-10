@@ -118,24 +118,22 @@ export default function Home() {
 
 
 
-    const newChat = () => {
-        const request_id = lastRequestIdRef.current + 1
-        lastRequestIdRef.current = request_id
+
+
+
+
+    const chat = async () => {
+        lastRequestIdRef.current +=1
+        const request_id = Number(lastRequestIdRef.current)
 
         if (isLoading) {
-            setIsLoading(false)
-        } else {
-            chat(request_id)
+            return setIsLoading(false)
         }
-    }
 
-
-
-
-    const chat = async (request_id) => {
         setIsLoading(true)
 
         const result = await getGPTResult()
+        console.log(request_id," ",lastRequestIdRef.current);
 
         // check last request id is the same, if not means canceled request
         if (lastRequestIdRef.current !== request_id) {
