@@ -97,42 +97,39 @@ export default function Home() {
 
 
     const extractWebCodes = (code = "") => {
-        const htmlPattern = /<!DOCTYPE html>|<html>[\s\S]*?<\/html>/i
-        const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi
-        const cssPattern = /<style\b[^>]*>[\s\S]*?<\/style>/gi
-
-        let htmlCode = ""
-        let cssCode = ""
-        let jsCode = ""
-
-        // extract
-        const htmlMatch = code.match(htmlPattern)
-        const scriptsMatch = code.match(scriptPattern)
-        const cssMatch = code.match(cssPattern)
-
-
-        // setup codes
+        const htmlPattern = /(?:<!DOCTYPE html>|<html>)[\s\S]*?<\/html>/i;
+        const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi;
+        const cssPattern = /<style\b[^>]*>[\s\S]*?<\/style>/gi;
+    
+        let htmlCode = "";
+        let cssCode = "";
+        let jsCode = "";
+    
+        const htmlMatch = code.match(htmlPattern);
+        const scriptsMatch = code.match(scriptPattern);
+        const cssMatch = code.match(cssPattern);
+    
         if (htmlMatch) {
-            htmlCode = (htmlMatch[0].replace(scriptPattern, "")).replace(cssPattern, "")
+            htmlCode = htmlMatch[0];
+            htmlCode = htmlCode.replace(scriptPattern, "");
+            htmlCode = htmlCode.replace(cssPattern, "");
         }
+    
         if (scriptsMatch) {
-            scriptsMatch.forEach(script => {
-                jsCode += script
-            })
+            jsCode = scriptsMatch.join("\n");
         }
+    
         if (cssMatch) {
-            cssMatch.forEach(style => {
-                cssCode += style
-            })
+            cssCode = cssMatch.join("\n");
         }
-
+    
         return {
-            html: htmlCode,
-            js: jsCode,
-            css: cssCode
-        }
-    }
-
+            html: htmlCode.trim(),
+            js: jsCode.trim(),
+            css: cssCode.trim()
+        };
+    };
+    
 
 
 
