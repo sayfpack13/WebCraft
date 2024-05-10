@@ -113,24 +113,28 @@ export default function Home() {
             htmlsMatch.forEach(match => {
                 let cleanedHtml = match.replace(scriptPattern, "")
                 cleanedHtml = cleanedHtml.replace(cssPattern, "")
-                htmlCode += cleanedHtml
+                htmlCode += cleanedHtml+"\n"
             })
         }
 
         if (scriptsMatch) {
-            jsCode = scriptsMatch
+            scriptsMatch.forEach(match => {
+                jsCode += match+"\n"
+            })
         }
 
         if (cssMatch) {
-            cssCode = cssMatch
+            cssMatch.forEach(match => {
+                cssCode += match+"\n"
+            })
         }
 
         return {
             html: htmlCode,
             js: jsCode,
             css: cssCode
-        };
-    };
+        }
+    }
 
 
 
