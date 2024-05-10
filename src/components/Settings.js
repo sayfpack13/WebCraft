@@ -1,5 +1,38 @@
-export default function Settings() {
+import { useState } from "react";
+import { FaToggleOff, FaToggleOn } from "react-icons/fa";
+import { IoIosClose } from "react-icons/io";
 
+export default function SettingsUI({isSeperatedCodeView,setisSeperatedCodeView, onClose }) {
+
+    const OptionUI = ({ title, isEnabled, onToggle }) => {
+        return (
+            <div className="settings-option">
+                <button onClick={() => { onToggle(!isEnabled) }} className="settings-option-toggle-button">
+                    {isEnabled ? <FaToggleOn /> : <FaToggleOff />}
+                    <div className="settings-option-title">
+                        {title}
+                    </div>
+                </button>
+
+            </div>
+        )
+    }
+
+    return (
+        <div className="settings">
+            <div className="settings-content">
+                <div className="settings-header">
+                    <div className="settings-header-title">Settings</div>
+                    <button onClick={onClose} className="settings-close-button"><IoIosClose /></button>
+                </div>
+
+                <OptionUI title={"Seperate Code View"} isEnabled={isSeperatedCodeView} onToggle={(value)=>{
+                    setisSeperatedCodeView(value)
+                    setSetting("code.seperated",value)
+                }} />
+            </div>
+        </div>
+    )
 }
 
 
@@ -12,11 +45,12 @@ export function getSettings() {
             css: false,
             js: false
         },
-        code:{
-            full:"",
-            html:"",
-            css:"",
-            js:""
+        code: {
+            seperated:true,
+            full: "",
+            html: "",
+            css: "",
+            js: ""
         },
     }
 }
@@ -34,8 +68,8 @@ export function setSetting(keys, value) {
 
     for (let a = 0; a < keysArray.length - 1; a++) {
         const key = keysArray[a]
-        if(!current[key]){
-            current[key]={}
+        if (!current[key]) {
+            current[key] = {}
         }
         current = current[key]
     }

@@ -27,8 +27,7 @@ export default function TextAreaEditor({ id, title, value, onChange, disabled, p
 
             <div className="editor-header">
                 <div className="editor-header-title">{title}</div>
-                <button onClick={toggleMinimized} className="editor-header-button">{isMinimized ? <CiMaximize1 /> : <CiMinimize1 />}</button>
-
+                {id && <button onClick={toggleMinimized} className="editor-header-button">{isMinimized ? <CiMaximize1 /> : <CiMinimize1 />}</button>}
             </div>
 
             <div className={!isMinimized ? "editor-content" : "editor-content minimized"}>

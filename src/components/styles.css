@@ -58,10 +58,11 @@ button:disabled {
     padding: 10px;
 }
 
-.prompt-button.canceled{
+.prompt-button.canceled {
     background-color: #ff2019;
 }
-.prompt-button.canceled:hover{
+
+.prompt-button.canceled:hover {
     background-color: #ff0900;
 }
 
@@ -181,12 +182,17 @@ textarea:focus {
 
 .loader {
     align-content: center;
-    margin-left: auto;
-    margin-right: auto;
-    width: 20% !important;
+    display: flex;
+    justify-content: center;
+    width: 100% !important;
+    height: 100% !important;
     animation: fade-in 1.0s;
 }
 
+.loader svg {
+    fill: #007bff;
+    width: 10vh;
+}
 
 @keyframes fade-in {
     from {
@@ -201,7 +207,66 @@ textarea:focus {
 }
 
 
+.settings {
+    width: 100%;
+    background-color: #000000b3;
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-.loader svg {
-    fill: #007bff;
+.settings-content {
+    border-radius: 20px;
+    background-color: #333;
+    width: 50vh;
+    z-index: 2;
+}
+
+.settings-header {
+    border-radius: 20px 20px 0px 0px;
+    padding: 10px;
+    background-color: #bbb;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.settings-header-title {
+    font-size: 3vh;
+    font-weight: bold;
+}
+
+.settings-close-button {
+    margin-left: auto;
+    font-size: 5vh;
+    display: flex;
+    align-items: center;
+}
+
+.settings-option{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.settings-option-toggle-button{
+    font-size: 4vh;
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.settings-option-title{
+    font-size: 3vh;
+    margin-left: 10px;
+}
+
+.settings-button {
+    display: flex;
+    font-size: 3.5vh;
+    margin-right: 10px;
 }

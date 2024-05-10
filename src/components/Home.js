@@ -5,9 +5,9 @@ import Loading from "react-loading"
 import { Bounce, ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
 import TextAreaEditor from "./TextAreaEditor"
-import { IoIosSend } from "react-icons/io"
+import { IoIosSend, IoIosSettings } from "react-icons/io"
 import { MdCancel } from "react-icons/md"
-import { getSettings, setSetting } from "./Settings"
+import SettingsUI, { getSettings, setSetting } from "./Settings"
 
 export default function Home() {
     // Google Generative AI API Key
@@ -21,20 +21,39 @@ export default function Home() {
     const [userPrompt, setUserPrompt] = useState("")
     const [isLoading, setIsLoading] = useState(null)
     const [gptInstance, setGptInstance] = useState()
+    const [isSettingsOpen, setisSettingsOpen] = useState(false)
     const lastRequestIdRef = useRef(0)
 
-    const [gptResult, setGptResult] = useState(getSettings().code.full || "")
-    const [htmlCode, sethtmlCode] = useState(getSettings().code.html || "")
-    const [cssCode, setcssCode] = useState(getSettings().code.css || "")
-    const [jsCode, setjsCode] = useState(getSettings().code.js || "")
+    const [webCode, setWebCode] = useState(getSettings().code.full)
+    const [htmlCode, sethtmlCode] = useState(getSettings().code.html)
+    const [cssCode, setcssCode] = useState(getSettings().code.css)
+    const [jsCode, setjsCode] = useState(getSettings().code.js)
+    const [isSeperatedCodeView, setisSeperatedCodeView] = useState(getSettings().code.seperated)
+
+    useEffect(() => {
+        if (isSeperatedCodeView) {
+            return
+        }
+        // extract
+        const extractedCode = extractWebCodes(webCode)
+        sethtmlCode(extractedCode.html)
+        setcssCode(extractedCode.css)
+        setjsCode(extractedCode.js)
+        setSetting("code.full", webCode)
+    }, [webCode])
 
 
     useEffect(() => {
-        setSetting("code.full", gptResult)
+        if (!isSeperatedCodeView) {
+            return
+        }
+
+        setWebCode(htmlCode + "\n\n" + cssCode + "\n\n" + jsCode)
         setSetting("code.html", htmlCode)
         setSetting("code.css", cssCode)
         setSetting("code.js", jsCode)
-    }, [gptResult, htmlCode, cssCode, jsCode])
+    }, [htmlCode, cssCode, jsCode])
+
 
 
 
@@ -78,7 +97,7 @@ export default function Home() {
 
 
     const extractWebCodes = (code = "") => {
-        const htmlPattern = /<!DOCTYPE html>[\s\S]*?<\/html>/i
+        const htmlPattern = /<!DOCTYPE html>|<html>[\s\S]*?<\/html>/i
         const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi
         const cssPattern = /<style\b[^>]*>[\s\S]*?<\/style>/gi
 
@@ -123,7 +142,7 @@ export default function Home() {
 
 
     const chat = async () => {
-        lastRequestIdRef.current +=1
+        lastRequestIdRef.current += 1
         const request_id = Number(lastRequestIdRef.current)
 
         if (isLoading) {
@@ -133,7 +152,6 @@ export default function Home() {
         setIsLoading(true)
 
         const result = await getGPTResult()
-        console.log(request_id," ",lastRequestIdRef.current);
 
         // check last request id is the same, if not means canceled request
         if (lastRequestIdRef.current !== request_id) {
@@ -147,11 +165,8 @@ export default function Home() {
             toast.error(error)
         } else {
             // success
-            setGptResult(result)
             const extractedCode = extractWebCodes(result)
-            sethtmlCode(extractedCode.html)
-            setcssCode(extractedCode.css)
-            setjsCode(extractedCode.js)
+            setWebCode(extractedCode.html + extractedCode.css + extractedCode.js)
         }
 
 
@@ -159,7 +174,9 @@ export default function Home() {
     }
 
 
-
+    const toggleSettings = () => {
+        setisSettingsOpen(!isSettingsOpen)
+    }
 
     return (
         <div className="container">
@@ -179,44 +196,62 @@ export default function Home() {
                 transition={Bounce}
             />
 
+            {isSettingsOpen && <SettingsUI isSeperatedCodeView={isSeperatedCodeView} setisSeperatedCodeView={setisSeperatedCodeView} onClose={toggleSettings} />}
+
             <div className="editor-container">
                 <div className="left-container">
                     {isLoading ?
                         <Loading className="loader" type="spin"></Loading>
                         :
-                        <iframe srcDoc={htmlCode + cssCode + jsCode} title="Result"></iframe>
+                        <iframe srcDoc={webCode} title="Result"></iframe>
                     }
                 </div>
 
 
 
-                <div className="right-container">
-                    <TextAreaEditor
-                        id={"html"}
-                        title={"Html Code"}
-                        disabled={isLoading}
-                        value={htmlCode}
-                        onChange={sethtmlCode}
-                        placeholder="<html>&#10;Html Code&#10;</html>" />
-                    <TextAreaEditor
-                        id={"css"}
-                        title={"Css Code"}
-                        disabled={isLoading}
-                        value={cssCode}
-                        onChange={setcssCode}
-                        placeholder="<style>&#10;Css Code&#10;</style>" />
-                    <TextAreaEditor
-                        id={"js"}
-                        title={"JavaScript Code"}
-                        disabled={isLoading}
-                        value={jsCode}
-                        onChange={setjsCode}
-                        placeholder="<script src='http://example.com/file.js' />&#10;<script>&#10;JavaScript Code&#10;</script>" />
-                </div>
+                {isSeperatedCodeView ?
+                    <div className="right-container">
+                        <TextAreaEditor
+                            id={"html"}
+                            title={"Html Code"}
+                            disabled={isLoading}
+                            value={htmlCode}
+                            onChange={sethtmlCode}
+                            placeholder="<html>&#10;Html Code&#10;</html>" />
+                        <TextAreaEditor
+                            id={"css"}
+                            title={"Css Code"}
+                            disabled={isLoading}
+                            value={cssCode}
+                            onChange={setcssCode}
+                            placeholder="<style>&#10;Css Code&#10;</style>" />
+                        <TextAreaEditor
+                            id={"js"}
+                            title={"JavaScript Code"}
+                            disabled={isLoading}
+                            value={jsCode}
+                            onChange={setjsCode}
+                            placeholder="<script src='http://example.com/file.js' />&#10;<script>&#10;JavaScript Code&#10;</script>" />
+                    </div>
+                    :
+                    <div className="right-container">
+                        <TextAreaEditor
+                            id={""}
+                            title={"Web Code"}
+                            disabled={isLoading}
+                            value={webCode}
+                            onChange={setWebCode}
+                            placeholder="<html>&#10;Web Code&#10;</html>" />
+                    </div>
+                }
             </div>
 
 
             <div className="input-container">
+                <button className="settings-button" onClick={toggleSettings}>
+                    <IoIosSettings />
+                </button>
+
                 <textarea
                     className="input-field"
                     disabled={isLoading}
