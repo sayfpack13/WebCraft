@@ -110,9 +110,11 @@ export default function Home() {
         const cssMatch = code.match(cssPattern)
 
         if (htmlsMatch) {
-            htmlCode = htmlsMatch
-            htmlCode = htmlCode.replace(scriptPattern, "")
-            htmlCode = htmlCode.replace(cssPattern, "")
+            htmlsMatch.forEach(match => {
+                let cleanedHtml = match.replace(scriptPattern, "")
+                cleanedHtml = cleanedHtml.replace(cssPattern, "")
+                htmlCode += cleanedHtml
+            })
         }
 
         if (scriptsMatch) {
