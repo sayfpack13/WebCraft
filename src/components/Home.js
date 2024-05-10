@@ -48,7 +48,7 @@ export default function Home() {
             return
         }
 
-        setWebCode(htmlCode + "\n\n" + cssCode + "\n\n" + jsCode)
+        setWebCode(htmlCode  + cssCode + jsCode)
         setSetting("code.html", htmlCode)
         setSetting("code.css", cssCode)
         setSetting("code.js", jsCode)
@@ -124,9 +124,9 @@ export default function Home() {
         }
     
         return {
-            html: htmlCode.trim(),
-            js: jsCode.trim(),
-            css: cssCode.trim()
+            html: htmlCode,
+            js: jsCode,
+            css: cssCode
         };
     };
     
@@ -164,6 +164,9 @@ export default function Home() {
             // success
             const extractedCode = extractWebCodes(result)
             setWebCode(extractedCode.html + extractedCode.css + extractedCode.js)
+            sethtmlCode(extractedCode.html)
+            setcssCode(extractedCode.css)
+            setjsCode(extractedCode.js)
         }
 
 
