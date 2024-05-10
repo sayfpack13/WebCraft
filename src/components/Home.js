@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import TextAreaEditor from "./TextAreaEditor"
 import { IoIosSend } from "react-icons/io"
 import { MdCancel } from "react-icons/md"
+import { getSettings, setSetting } from "./Settings"
 
 export default function Home() {
     // Google Generative AI API Key
@@ -22,10 +23,19 @@ export default function Home() {
     const [gptInstance, setGptInstance] = useState()
     const lastRequestIdRef = useRef(0)
 
-    const [gptResult, setGptResult] = useState("")
-    const [htmlCode, sethtmlCode] = useState("")
-    const [cssCode, setcssCode] = useState("")
-    const [jsCode, setjsCode] = useState("")
+    const [gptResult, setGptResult] = useState(getSettings().code.full)
+    const [htmlCode, sethtmlCode] = useState(getSettings().code.html)
+    const [cssCode, setcssCode] = useState(getSettings().code.css)
+    const [jsCode, setjsCode] = useState(getSettings().code.js)
+
+
+    useEffect(() => {
+        setSetting("code.full", gptResult)
+        setSetting("code.html", htmlCode)
+        setSetting("code.css", cssCode)
+        setSetting("code.js", jsCode)
+    }, [gptResult, htmlCode, cssCode, jsCode])
+
 
 
 
@@ -57,7 +67,12 @@ export default function Home() {
 
             return result
         } catch (error) {
-            return handleGPTError(response.candidates[0].finishReason)
+            try {
+                return handleGPTError(response.candidates[0].finishReason)
+            } catch (error2) {
+                return handleGPTError("Error Contacting AI !!")
+            }
+
         }
     }
 
@@ -104,12 +119,13 @@ export default function Home() {
 
 
     const newChat = () => {
-        lastRequestIdRef.current++
+        const request_id = lastRequestIdRef.current + 1
+        lastRequestIdRef.current = request_id
 
         if (isLoading) {
             setIsLoading(false)
         } else {
-            chat(lastRequestIdRef.current)
+            chat(request_id)
         }
     }
 
@@ -122,7 +138,7 @@ export default function Home() {
         const result = await getGPTResult()
 
         // check last request id is the same, if not means canceled request
-        if(lastRequestIdRef.current!=request_id){
+        if (lastRequestIdRef.current !== request_id) {
             return
         }
 

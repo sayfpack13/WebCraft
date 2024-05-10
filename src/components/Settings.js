@@ -12,10 +12,16 @@ export function getSettings() {
             css: false,
             js: false
         },
+        code:{
+            full:"",
+            html:"",
+            css:"",
+            js:""
+        },
     }
 }
 
-export function setSettings(settings) {
+function setSettings(settings) {
     localStorage.setItem("settings", JSON.stringify(settings))
 }
 
@@ -28,6 +34,9 @@ export function setSetting(keys, value) {
 
     for (let a = 0; a < keysArray.length - 1; a++) {
         const key = keysArray[a]
+        if(!current[key]){
+            current[key]={}
+        }
         current = current[key]
     }
 
