@@ -39,7 +39,11 @@ export default function Home() {
         sethtmlCode(extractedCode.html)
         setcssCode(extractedCode.css)
         setjsCode(extractedCode.js)
+
         setSetting("code.full", webCode)
+        setSetting("code.html", extractedCode.html)
+        setSetting("code.css", extractedCode.css)
+        setSetting("code.js", extractedCode.js)
     }, [webCode])
 
 
@@ -48,7 +52,9 @@ export default function Home() {
             return
         }
 
-        setWebCode(htmlCode + "\n" + cssCode + "\n" + jsCode)
+        const newWebCode=htmlCode + "\n" + cssCode + "\n" + jsCode
+        setWebCode(newWebCode)
+        setSetting("code.full", newWebCode)
         setSetting("code.html", htmlCode)
         setSetting("code.css", cssCode)
         setSetting("code.js", jsCode)
