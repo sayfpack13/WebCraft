@@ -97,45 +97,42 @@ export default function Home() {
 
 
     const extractWebCodes = (code = "") => {
-        const htmlPattern = /(?:<!DOCTYPE html>|<html>)[\s\S]*?<\/html>/i
+        const htmlPattern = /(?:<!DOCTYPE html>|<html>)[\s\S]*?<\/html>/gi
         const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi
         const cssPattern = /<style\b[^>]*>[\s\S]*?<\/style>/gi
-
+    
         let htmlCode = ""
         let cssCode = ""
         let jsCode = ""
-
-        const htmlsMatch = code.match(htmlPattern)
-        const scriptsMatch = code.match(scriptPattern)
-        const cssMatch = code.match(cssPattern)
-
-        if (htmlsMatch) {
-            htmlsMatch.forEach(match => {
-                let cleanedHtml = match.replace(scriptPattern, "")
-                cleanedHtml = cleanedHtml.replace(cssPattern, "")
-                htmlCode += cleanedHtml+"\n"
+    
+        const htmlMatches = code.match(htmlPattern)
+        
+        htmlMatches.forEach(htmlBlock => {
+            let jsMatches = htmlBlock.match(scriptPattern) || []
+            let cssMatches = htmlBlock.match(cssPattern) || []
+    
+            // Remove script and style tags
+            let cleanedHtml = htmlBlock.replace(scriptPattern, "").replace(cssPattern, "")
+    
+            htmlCode += cleanedHtml.trim() + "\n"
+    
+            // Concatenate JavaScript code
+            jsMatches.forEach(match => {
+                jsCode += match.trim() + "\n"
+            });
+    
+            // Concatenate CSS code
+            cssMatches.forEach(match => {
+                cssCode += match.trim() + "\n"
             })
-        }
-
-        if (scriptsMatch) {
-            scriptsMatch.forEach(match => {
-                jsCode += match+"\n"
-            })
-        }
-
-        if (cssMatch) {
-            cssMatch.forEach(match => {
-                cssCode += match+"\n"
-            })
-        }
-
+        })
+    
         return {
-            html: htmlCode,
-            js: jsCode,
-            css: cssCode
+            html: htmlCode.trim(),
+            js: jsCode.trim(),
+            css: cssCode.trim()
         }
     }
-
 
 
 
