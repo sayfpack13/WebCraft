@@ -105,26 +105,22 @@ export default function Home() {
         let cssCode = ""
         let jsCode = ""
     
-        const htmlMatches = code.match(htmlPattern)
-        
+        const htmlMatches = code.match(htmlPattern)|| []
+        const jsMatches = code.match(scriptPattern) || []
+        const cssMatches = code.match(cssPattern) || []
+
+        jsMatches.forEach(match => {
+            jsCode += match.trim() + "\n"
+        })
+
+
+        cssMatches.forEach(match => {
+            cssCode += match.trim() + "\n"
+        })
+
         htmlMatches.forEach(htmlBlock => {
-            let jsMatches = htmlBlock.match(scriptPattern) || []
-            let cssMatches = htmlBlock.match(cssPattern) || []
-    
-            // Remove script and style tags
             let cleanedHtml = htmlBlock.replace(scriptPattern, "").replace(cssPattern, "")
-    
             htmlCode += cleanedHtml.trim() + "\n"
-    
-            // Concatenate JavaScript code
-            jsMatches.forEach(match => {
-                jsCode += match.trim() + "\n"
-            });
-    
-            // Concatenate CSS code
-            cssMatches.forEach(match => {
-                cssCode += match.trim() + "\n"
-            })
         })
     
         return {
