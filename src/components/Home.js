@@ -30,38 +30,27 @@ export default function Home() {
     const [jsCode, setjsCode] = useState(getSettings().code.js)
     const [isSeperatedCodeView, setisSeperatedCodeView] = useState(getSettings().code.seperated)
 
-    useEffect(() => {
-        if (isSeperatedCodeView) {
-            return
-        }
-        // extract
-        const extractedCode = extractWebCodes(webCode)
-        sethtmlCode(extractedCode.html)
-        setcssCode(extractedCode.css)
-        setjsCode(extractedCode.js)
 
+
+    useEffect(() => {
         setSetting("code.full", webCode)
-        setSetting("code.html", extractedCode.html)
-        setSetting("code.css", extractedCode.css)
-        setSetting("code.js", extractedCode.js)
-    }, [webCode])
-
-
-    useEffect(() => {
-        if (!isSeperatedCodeView) {
-            return
-        }
-
-        const newWebCode=htmlCode + "\n" + cssCode + "\n" + jsCode
-        setWebCode(newWebCode)
-        setSetting("code.full", newWebCode)
         setSetting("code.html", htmlCode)
         setSetting("code.css", cssCode)
         setSetting("code.js", jsCode)
-    }, [htmlCode, cssCode, jsCode])
+    }, [webCode, htmlCode, cssCode, jsCode])
 
 
-
+    useEffect(() => {
+        if (isSeperatedCodeView) {
+            const extractedCode = extractWebCodes(webCode)
+            sethtmlCode(extractedCode.html + "\n" + extractedCode.nonhtml)
+            setcssCode(extractedCode.css)
+            setjsCode(extractedCode.js)
+        } else {
+            const extractedCode = extractWebCodes(htmlCode + cssCode + jsCode)
+            setWebCode(extractedCode.html + "\n" + extractedCode.nonhtml + "\n" + extractedCode.css + "\n" + extractedCode.js)
+        }
+    }, [isSeperatedCodeView])
 
 
     const getGPT = () => {
@@ -106,12 +95,13 @@ export default function Home() {
         const htmlPattern = /(?:<!DOCTYPE html>|<html>)[\s\S]*?<\/html>/gi
         const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi
         const cssPattern = /<style\b[^>]*>[\s\S]*?<\/style>/gi
-    
+
+        let nonHtmlCode = ""
         let htmlCode = ""
         let cssCode = ""
         let jsCode = ""
-    
-        const htmlMatches = code.match(htmlPattern)|| []
+
+        const htmlMatches = code.match(htmlPattern) || []
         const jsMatches = code.match(scriptPattern) || []
         const cssMatches = code.match(cssPattern) || []
 
@@ -124,15 +114,24 @@ export default function Home() {
             cssCode += match.trim() + "\n"
         })
 
+
+
         htmlMatches.forEach(htmlBlock => {
             let cleanedHtml = htmlBlock.replace(scriptPattern, "").replace(cssPattern, "")
             htmlCode += cleanedHtml.trim() + "\n"
         })
-    
+
+        const nonHtmlBlocks = code.split(htmlPattern)
+        nonHtmlBlocks.forEach(block => {
+            let cleanedNonHtml = block.replace(scriptPattern, "").replace(cssPattern, "")
+            nonHtmlCode += cleanedNonHtml.trim() + "\n"
+        })
+
         return {
             html: htmlCode.trim(),
             js: jsCode.trim(),
-            css: cssCode.trim()
+            css: cssCode.trim(),
+            nonhtml: nonHtmlCode.trim()
         }
     }
 
@@ -168,7 +167,7 @@ export default function Home() {
         } else {
             // success
             const extractedCode = extractWebCodes(result)
-            setWebCode(extractedCode.html + "\n" + extractedCode.css + "\n" + extractedCode.js)
+            setWebCode(result)
             sethtmlCode(extractedCode.html)
             setcssCode(extractedCode.css)
             setjsCode(extractedCode.js)
