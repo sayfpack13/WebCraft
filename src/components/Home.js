@@ -7,7 +7,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import TextAreaEditor from "./TextAreaEditor"
 import { IoIosSend, IoIosSettings } from "react-icons/io"
 import { MdCancel } from "react-icons/md"
-import SettingsUI, { getSettings, setSetting } from "./Settings"
+import SettingsUI from "./Settings"
+import { Header } from "./Header"
+import { extractWebCodes, getSettings, saveAsHtml, setSetting } from "./utils"
 
 export default function Home() {
     // Google Generative AI API Key
@@ -15,42 +17,102 @@ export default function Home() {
     // show error reason if AI prompt failed
     const onErrorShowReason = true
     // Default prompt - don't change
-    const prompt = "Generate HTML, CSS, and JavaScript code for a web page, if not possible as response return " + (onErrorShowReason ? "'null:<reason>'" : "'null'") + ". User prompt: "
+    const prompt = "Rule:Generate web page code using <html>, <style>, and <script> only, if not possible as response return " + (onErrorShowReason ? "'null:<reason>'" : "'null'") + ". User prompt: "
+    const helpDomain = "https://mmgc.ninja"
 
+    // async loading state
+    const [isDataLoading, setisDataLoading] = useState(true)
+    // count initiliazed states
+    const initiliazedCount = useRef(0)
+    // number of states to initiliaze
+    const initiliazeCount = 5
 
     const [userPrompt, setUserPrompt] = useState("")
-    const [isLoading, setIsLoading] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
     const [gptInstance, setGptInstance] = useState()
     const [isSettingsOpen, setisSettingsOpen] = useState(false)
     const lastRequestIdRef = useRef(0)
 
-    const [webCode, setWebCode] = useState(getSettings().code.full)
-    const [htmlCode, sethtmlCode] = useState(getSettings().code.html)
-    const [cssCode, setcssCode] = useState(getSettings().code.css)
-    const [jsCode, setjsCode] = useState(getSettings().code.js)
-    const [isSeperatedCodeView, setisSeperatedCodeView] = useState(getSettings().code.seperated)
+    const [webCode, setWebCode] = useState(null)
+    const [htmlCode, sethtmlCode] = useState(null)
+    const [cssCode, setcssCode] = useState(null)
+    const [jsCode, setjsCode] = useState(null)
+    const [isSeperatedCodeView, setisSeperatedCodeView] = useState(null)
+    const [isPreviewMinimized, setisPreviewMinimized] = useState(null)
+    const [isEditorMinimized, setisEditorMinimized] = useState(null)
 
+    // check if useEffect can be used only after initiliazed states !!
+    const canUseEffectUpdate = () => {
+        if (isDataLoading) {
+            return false
+        }
+        if (initiliazedCount.current !== initiliazeCount) {
+            initiliazedCount.current += 1
+            return false
+        }
 
+        return true
+    }
 
+    // useEffects
     useEffect(() => {
+        setWebCode(getSettings().code.full)
+        sethtmlCode(getSettings().code.html)
+        setcssCode(getSettings().code.css)
+        setjsCode(getSettings().code.js)
+        setisSeperatedCodeView(getSettings().code.seperated)
+        setisPreviewMinimized(getSettings().isMinimized.preview)
+        setisEditorMinimized(getSettings().isMinimized.editor)
+
+        setisDataLoading(false)
+    }, [])
+    useEffect(() => {
+        if (!canUseEffectUpdate()) {
+            return
+        }
         setSetting("code.full", webCode)
-        setSetting("code.html", htmlCode)
-        setSetting("code.css", cssCode)
-        setSetting("code.js", jsCode)
-    }, [webCode, htmlCode, cssCode, jsCode])
-
-
+    }, [webCode])
     useEffect(() => {
+        if (!canUseEffectUpdate()) {
+            return
+        }
+        console.log(htmlCode);
+        setSetting("code.html", htmlCode)
+    }, [htmlCode])
+    useEffect(() => {
+        if (!canUseEffectUpdate()) {
+            return
+        }
+        setSetting("code.css", cssCode)
+    }, [cssCode])
+    useEffect(() => {
+        if (!canUseEffectUpdate()) {
+            return
+        }
+        setSetting("code.js", jsCode)
+    }, [jsCode])
+    useEffect(() => {
+        if (!canUseEffectUpdate()) {
+            return
+        }
+
         if (isSeperatedCodeView) {
             const extractedCode = extractWebCodes(webCode)
-            sethtmlCode(extractedCode.html + "\n" + extractedCode.nonhtml)
+            sethtmlCode((extractedCode.html + "\n" + extractedCode.nonhtml).trim())
             setcssCode(extractedCode.css)
             setjsCode(extractedCode.js)
         } else {
             const extractedCode = extractWebCodes(htmlCode + cssCode + jsCode)
-            setWebCode(extractedCode.html + "\n" + extractedCode.nonhtml + "\n" + extractedCode.css + "\n" + extractedCode.js)
+            setWebCode((extractedCode.html + "\n" + extractedCode.nonhtml + "\n" + extractedCode.css + "\n" + extractedCode.js).trim())
         }
     }, [isSeperatedCodeView])
+    // useEffects
+
+
+
+
+
+
 
 
     const getGPT = () => {
@@ -89,54 +151,6 @@ export default function Home() {
 
         }
     }
-
-
-    const extractWebCodes = (code = "") => {
-        const htmlPattern = /(?:<!DOCTYPE html>|<html>)[\s\S]*?<\/html>/gi
-        const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi
-        const cssPattern = /<style\b[^>]*>[\s\S]*?<\/style>/gi
-
-        let nonHtmlCode = ""
-        let htmlCode = ""
-        let cssCode = ""
-        let jsCode = ""
-
-        const htmlMatches = code.match(htmlPattern) || []
-        const jsMatches = code.match(scriptPattern) || []
-        const cssMatches = code.match(cssPattern) || []
-
-        jsMatches.forEach(match => {
-            jsCode += match.trim() + "\n"
-        })
-
-
-        cssMatches.forEach(match => {
-            cssCode += match.trim() + "\n"
-        })
-
-
-
-        htmlMatches.forEach(htmlBlock => {
-            let cleanedHtml = htmlBlock.replace(scriptPattern, "").replace(cssPattern, "")
-            htmlCode += cleanedHtml.trim() + "\n"
-        })
-
-        const nonHtmlBlocks = code.split(htmlPattern)
-        nonHtmlBlocks.forEach(block => {
-            let cleanedNonHtml = block.replace(scriptPattern, "").replace(cssPattern, "")
-            nonHtmlCode += cleanedNonHtml.trim() + "\n"
-        })
-
-        return {
-            html: htmlCode.trim(),
-            js: jsCode.trim(),
-            css: cssCode.trim(),
-            nonhtml: nonHtmlCode.trim()
-        }
-    }
-
-
-
 
 
 
@@ -182,6 +196,37 @@ export default function Home() {
         setisSettingsOpen(!isSettingsOpen)
     }
 
+
+
+    const openFile = (result) => {
+        const extractedCode = extractWebCodes(result)
+        setWebCode(result)
+        sethtmlCode(extractedCode.html)
+        setcssCode(extractedCode.css)
+        setjsCode(extractedCode.js)
+    }
+
+    const saveFile = () => {
+        let content = ""
+        let filename = "WebCraft"
+
+
+        if (isSeperatedCodeView) {
+            content = htmlCode + "\n" + cssCode + "\n" + jsCode
+        } else {
+            content = webCode
+        }
+
+        saveAsHtml(content, filename)
+    }
+
+    const clearEditor = () => {
+        setWebCode("")
+        sethtmlCode("")
+        setcssCode("")
+        setjsCode("")
+    }
+
     return (
         <div className="container">
             <ToastContainer
@@ -199,21 +244,28 @@ export default function Home() {
                 toastStyle={{ fontWeight: "bold" }}
                 transition={Bounce}
             />
+            <Header
+                onOpenFile={openFile}
+                onSaveFile={saveFile}
+                onClearEditor={clearEditor}
+                onsetisPreviewMinimized={setisPreviewMinimized}
+                onsetisEditorMinimized={setisEditorMinimized} 
+                helpDomain={helpDomain}/>
 
             {isSettingsOpen && <SettingsUI isSeperatedCodeView={isSeperatedCodeView} setisSeperatedCodeView={setisSeperatedCodeView} onClose={toggleSettings} />}
 
             <div className="editor-container">
-                <div className="left-container">
-                    {isLoading ?
-                        <Loading className="loader" type="spin"></Loading>
-                        :
-                        <iframe srcDoc={webCode} title="Result"></iframe>
-                    }
-                </div>
+                {isPreviewMinimized &&
+                    <div className="left-container">
+                        {isLoading ?
+                            <Loading className="loader" type="spin"></Loading>
+                            :
+                            <iframe srcDoc={isSeperatedCodeView ? (htmlCode + cssCode + jsCode) : webCode} title="Result"></iframe>
+                        }
+                    </div>
+                }
 
-
-
-                {isSeperatedCodeView ?
+                {isEditorMinimized &&
                     <div className="right-container">
                         <TextAreaEditor
                             id={"html"}
@@ -221,6 +273,7 @@ export default function Home() {
                             disabled={isLoading}
                             value={htmlCode}
                             onChange={sethtmlCode}
+                            isSeperatedCodeView={isSeperatedCodeView}
                             placeholder="<html>&#10;Html Code&#10;</html>" />
                         <TextAreaEditor
                             id={"css"}
@@ -228,6 +281,7 @@ export default function Home() {
                             disabled={isLoading}
                             value={cssCode}
                             onChange={setcssCode}
+                            isSeperatedCodeView={isSeperatedCodeView}
                             placeholder="<style>&#10;Css Code&#10;</style>" />
                         <TextAreaEditor
                             id={"js"}
@@ -235,16 +289,15 @@ export default function Home() {
                             disabled={isLoading}
                             value={jsCode}
                             onChange={setjsCode}
+                            isSeperatedCodeView={isSeperatedCodeView}
                             placeholder="<script src='http://example.com/file.js' />&#10;<script>&#10;JavaScript Code&#10;</script>" />
-                    </div>
-                    :
-                    <div className="right-container">
                         <TextAreaEditor
-                            id={""}
+                            id={"full"}
                             title={"Web Code"}
                             disabled={isLoading}
                             value={webCode}
                             onChange={setWebCode}
+                            isSeperatedCodeView={isSeperatedCodeView}
                             placeholder="<html>&#10;Web Code&#10;</html>" />
                     </div>
                 }

@@ -81,8 +81,7 @@ button:disabled {
 
 .left-container {
     align-content: center;
-    width: 50%;
-    min-width: 10%;
+    width: 100%;
 }
 
 .left-container iframe {
@@ -92,8 +91,7 @@ button:disabled {
 }
 
 .right-container {
-    min-width: 10%;
-    flex: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -212,7 +210,7 @@ textarea:focus {
     background-color: #000000b3;
     height: 100%;
     position: absolute;
-    z-index: 1;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -222,12 +220,13 @@ textarea:focus {
     border-radius: 20px;
     background-color: #333;
     width: 50vh;
-    z-index: 2;
 }
 
 .settings-header {
     border-radius: 20px 20px 0px 0px;
     padding: 10px;
+    padding-bottom: 5px;
+    padding-top: 5px;
     background-color: #bbb;
     display: flex;
     align-items: center;
@@ -241,26 +240,29 @@ textarea:focus {
 
 .settings-close-button {
     margin-left: auto;
-    font-size: 5vh;
+    font-size: 4vh;
     display: flex;
     align-items: center;
 }
 
-.settings-option{
+.settings-option {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 10px;
 }
 
-.settings-option-toggle-button{
+.settings-option-toggle-button {
     font-size: 4vh;
     display: flex;
     align-items: center;
     color: #fff;
 }
+.settings-option-toggle-button.active {
+    background-color: #0033c0;
+}
 
-.settings-option-title{
+.settings-option-title {
     font-size: 3vh;
     margin-left: 10px;
 }
@@ -269,4 +271,62 @@ textarea:focus {
     display: flex;
     font-size: 3.5vh;
     margin-right: 10px;
+}
+
+
+
+
+
+.header-container {
+    background-color: #bbb;
+    display: flex;
+    align-items: center;
+    z-index: 2;
+}
+
+.header-button-container{
+    height: 100%;
+    position: relative;
+}
+
+.header-button-menu{
+    background-color: #007bff;
+    position: absolute;
+    left: 0;
+    width: 250%;
+}
+.header-button-option{
+    width: 100%;
+    border-radius: 0;
+}
+
+.header-button {
+    border-radius: 0;
+    height: 100%;
+    padding-inline: 3vh;
+}
+
+.header-button-divider{
+    border: 1px solid #0044ff;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.header-button.active{
+    background-color: #0033c0;
+}
+.header-button.active:hover{
+    background-color: #0033c0;
+}
+
+.header-left,.header-right{
+    height: 100%;
+}
+
+.header-left {
+    display: flex;
+}
+
+.header-right {
+    margin-left: auto;
 }
