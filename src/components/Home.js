@@ -76,7 +76,6 @@ export default function Home() {
         if (!canUseEffectUpdate()) {
             return
         }
-        console.log(htmlCode);
         setSetting("code.html", htmlCode)
     }, [htmlCode])
     useEffect(() => {
